@@ -160,10 +160,14 @@ class CalendarSettings(private val context: Context) : ObservableSettings() {
 
         // ------------ Circle -------------------------------------------------------------------------------------
         internal var defaultCirclePaint: Paint = initializedDefaultCirclePaint()
+        internal var defaultCapPaint: Paint = initializedDefaultCapPaint()
         internal var todayCirclePaint: Paint = initializedTodayCirclePaint()
+        internal val squareRootOf2 = 1.41421356237
 
-        private fun initializedDefaultCirclePaint() = baseCirclePaint.copy().color(context.getColorCompat(R.color.light_calendar_view__day_circle_color))
+        private fun initializedDefaultCirclePaint() = baseCirclePaint.copy().color(Color.BLACK)
         private fun initializedTodayCirclePaint() = baseCirclePaint.copy().color(context.getStyledColor(android.R.attr.colorPrimary, context.getColorCompat(R.color.light_calendar_view__day_today_circle_color)))
+        private fun initializedDefaultCapPaint() = baseCirclePaint.copy().color(context.getColorCompat(R.color.colorDefaultBackground))
+
         // ---------------------------------------------------------------------------------------------------------
 
         // ------------ Text ---------------------------------------------------------------------------------------

@@ -29,9 +29,13 @@ import java.util.*
 class MonthView(context: Context, settings: CalendarSettings, var month: Date) : LinearLayout(context) {
 
     internal var onDateSelected: ((date: Date) -> Unit)? = null
+    internal var onDateRangeSelected: ((firstDate: Date, secondDate: Date) -> Unit)? = null
 
     private val weekDayLayout: WeekDayLayout = WeekDayLayout(context, settings)
-    private val dayLayout: DayLayout = DayLayout(context, settings, month).apply { onDateSelected = { date -> this@MonthView.onDateSelected?.invoke(date) } }
+    private val dayLayout: DayLayout = DayLayout(context, settings, month).apply {
+        onDateSelected = { date -> this@MonthView.onDateSelected?.invoke(date) }
+        onDateRangeSelected = { firstDate, secondDate -> this@MonthView.onDateRangeSelected?.invoke(firstDate, secondDate)}
+    }
 
     init {
         orientation = LinearLayout.VERTICAL

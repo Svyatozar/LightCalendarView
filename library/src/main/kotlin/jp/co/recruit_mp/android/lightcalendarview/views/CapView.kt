@@ -18,15 +18,17 @@ open class CapView(context: Context, settings: CalendarSettings) : CellView(cont
 
     val capPaint = settings.dayView.defaultCapPaint
 
-    override fun onDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas?) {
         if (isNeedCapDraw) {
             /**
              * Описываем высоту грани квадрата, которого можно вписать в окружность
              */
-            val resultHeight = canvas.height / settings.dayView.squareRootOf2
-            val margin = (canvas.height - resultHeight) / 2
 
-            canvas?.drawRect(0f, margin.toFloat(), canvas.height.toFloat(), (canvas.height.toFloat() - margin).toFloat(), capPaint)
+            val canvasHeight = canvas?.height ?: 0
+            val resultHeight = canvasHeight / settings.dayView.squareRootOf2
+            val margin = (canvasHeight - resultHeight) / 2
+
+            canvas?.drawRect(0f, margin.toFloat(), canvasHeight.toFloat(), (canvasHeight.toFloat() - margin).toFloat(), capPaint)
         }
     }
 }

@@ -38,6 +38,8 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
     private var selectedPage: Int = 0
     var onMonthSelected: ((date: Date, view: MonthView) -> Unit)? = null
     var onDateSelected: ((date: Date) -> Unit)? = null
+    var onDateRangeSelected: ((firstDate: Date, secondDate: Date) -> Unit)? = null
+
     private val onPageChangeListener: OnPageChangeListener = object : SimpleOnPageChangeListener() {
         override fun onPageSelected(position: Int) {
             selectedPage = position
@@ -87,6 +89,11 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
         addOnPageChangeListener(onPageChangeListener)
 
         currentItem = getPositionForDate(Date())
+    }
+
+    companion object {
+        var firstDate : Date? = null
+        var secondDate : Date? = null
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -256,6 +263,10 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
             val view = MonthView(context, settings, getDateForPosition(position)).apply {
                 tag = context.getString(R.string.month_view_tag_name, position)
                 onDateSelected = { date -> this@LightCalendarView.onDateSelected?.invoke(date) }
+                onDateRangeSelected = { firstDate, secondDate ->
+                        this@LightCalendarView.onDateRangeSelected?.invoke(firstDate, secondDate)
+                        invalidate()
+                }
             }
             container?.addView(view, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 

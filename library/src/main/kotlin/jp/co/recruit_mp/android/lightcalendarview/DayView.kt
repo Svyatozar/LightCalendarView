@@ -19,6 +19,7 @@ package jp.co.recruit_mp.android.lightcalendarview
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.support.v4.view.ViewCompat
@@ -26,13 +27,14 @@ import android.text.format.DateUtils
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.Interpolator
 import jp.co.recruit_mp.android.lightcalendarview.accent.Accent
+import jp.co.recruit_mp.android.lightcalendarview.views.CapView
 import java.util.*
 
 /**
  * 日を表示するための {@link CellView}
  * Created by masayuki-recruit on 8/18/16.
  */
-class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : CellView(context, settings) {
+class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : CapView(context, settings) {
 
     val date: Date = cal.time
     val weekDay: WeekDay = WeekDay.fromOrdinal(cal[Calendar.DAY_OF_WEEK] - 1)
@@ -43,6 +45,10 @@ class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : Cel
         get() = accents.fold(0, { w, a -> w + a.width + a.marginLeftRight * 2 })
 
     private var circlePaint: Paint = settings.dayView.defaultCirclePaint
+    private var squarePaint: Paint = Paint().apply {
+        color = Color.BLACK
+        style = Paint.Style.FILL
+    }
 
     private var textPaint: Paint = settings.dayView.defaultTextPaint(weekDay)
 
@@ -231,6 +237,16 @@ class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : Cel
         super.onDraw(canvas)
 
         canvas?.let {
+            if (isNeedCapDraw) {
+                /**
+                 * Описываем высоту грани квадрата, которого можно вписать в окружность
+                 */
+                val resultHeight = it.height / settings.dayView.squareRootOf2
+                val margin = (it.height - resultHeight) / 2
+
+                it?.drawRect(0f, margin.toFloat(), it.height.toFloat(), (it.height.toFloat() - margin).toFloat(), capPaint)
+            }
+
             // 背景の描画
             if (drawCircle) {
                 it.drawCircle(centerX, centerY, currentRadius, circlePaint)
@@ -240,7 +256,7 @@ class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : Cel
             it.drawText(text, baseX, baseY, textPaint)
 
             // accents 描画
-            drawAccents(it)
+            //drawAccents(it)
         }
     }
 

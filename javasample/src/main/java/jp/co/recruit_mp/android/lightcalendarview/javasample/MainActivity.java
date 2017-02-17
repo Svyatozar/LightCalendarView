@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
         calTo.set(Calendar.MONTH, 11);
 
         LightCalendarView calendarView = (LightCalendarView) findViewById(R.id.calendarView);
-        calendarView.setMonthFrom(calFrom.getTime());
-        calendarView.setMonthTo(calTo.getTime());
+        //calendarView.setMonthFrom(calFrom.getTime());
+        //calendarView.setMonthTo(calTo.getTime());
         calendarView.setMonthCurrent(calNow.getTime());
         calendarView.setOnMonthSelected(new Function2<Date, MonthView, Unit>() {
             @Override
@@ -59,15 +59,6 @@ public class MainActivity extends AppCompatActivity {
                                 dates.add(cal.getTime());
                             }
                         }
-                        HashMap<Date, List<Accent>> map = new HashMap<>();
-                        for (Date date : dates) {
-                            List<Accent> accents = new ArrayList<>();
-                            for (int i = 0; i <= (date.getDate() % 3); i++) {
-                                accents.add(new DotAccent(10f, null, formatter.format(date) + "-" + i));
-                            }
-                            map.put(date, accents);
-                        }
-                        monthView.setAccents(map);
                     }
                 }, 1000);
 

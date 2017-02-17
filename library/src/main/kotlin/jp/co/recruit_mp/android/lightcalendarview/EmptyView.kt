@@ -18,16 +18,16 @@ package jp.co.recruit_mp.android.lightcalendarview
 
 import android.content.Context
 import android.graphics.Canvas
+import jp.co.recruit_mp.android.lightcalendarview.views.CapView
 
 /**
  * Created by masayuki-recruit on 8/23/16.
  */
-class EmptyView(context: Context, settings: CalendarSettings) : CellView(context, settings) {
+class EmptyView(context: Context, settings: CalendarSettings) : CapView(context, settings) {
 
     override fun onDraw(canvas: Canvas?) {
-        // not in use
+        super.onDraw(canvas)
     }
 
     override fun toString(): String = "EmptyView"
-
 }

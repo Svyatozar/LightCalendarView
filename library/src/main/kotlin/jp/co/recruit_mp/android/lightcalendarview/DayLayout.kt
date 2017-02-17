@@ -18,6 +18,7 @@ package jp.co.recruit_mp.android.lightcalendarview
 
 import android.content.Context
 import android.support.v4.view.ViewCompat
+import jp.co.recruit_mp.android.lightcalendarview.views.CapView
 import java.util.*
 
 /**
@@ -37,8 +38,11 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         get() = DEFAULT_DAYS_IN_WEEK
 
     internal var selectedDayView: DayView? = null
+    internal var secondSelectedDayView: DayView? = null
 
     internal var onDateSelected: ((date: Date) -> Unit)? = null
+    internal var onDateRangeSelected: ((firstDate: Date, secondDate: Date) -> Unit)? = null
+
     private var firstDate: Calendar = CalendarKt.getInstance(settings)
     private var dayOfWeekOffset: Int = -1
     private val thisYear: Int
@@ -99,8 +103,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         val cal = firstDate.clone() as Calendar
 
         // 7 x 6 マスの DayView を追加する
-        (0..rowNum - 1).forEach {
-            (0..colNum - 1).forEach {
+        (0 until rowNum).forEach {
+            (0 until colNum).forEach {
                 when (cal[Calendar.MONTH]) {
                     thisMonth -> {
                         addView(instantiateDayView(cal.clone() as Calendar))
@@ -134,14 +138,87 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     }
 
     private fun setSelectedDay(view: DayView?) {
-        selectedDayView?.apply {
-            isSelected = false
-            updateState()
+        //TODO
+
+        when (view)
+        {
+            selectedDayView -> {
+                selectedDayView?.apply {
+                    isSelected = false
+                    updateState()
+                }
+
+                selectedDayView = null
+            }
+
+            secondSelectedDayView -> {
+                selectedDayView?.apply {
+                    isSelected = false
+                    updateState()
+                }
+
+                secondSelectedDayView = null
+            }
+
+            else -> {
+                if (selectedDayView != null) {
+                    secondSelectedDayView = view?.apply {
+                        isSelected = true
+                        updateState()
+                    }
+
+                    val firstDate = selectedDayView?.date
+                    val secondDate = secondSelectedDayView?.date
+
+                    if (null != firstDate && null != secondDate)
+                    {
+                        onDateRangeSelected?.invoke(firstDate, secondDate)
+
+                        LightCalendarView.firstDate = firstDate
+                        LightCalendarView.secondDate = secondDate
+                    }
+                }
+                else {
+                    selectedDayView = view?.apply {
+                        isSelected = true
+                        updateState()
+                        onDateSelected?.invoke(date)
+                    }
+                }
+            }
         }
-        selectedDayView = view?.apply {
-            isSelected = true
-            updateState()
-            onDateSelected?.invoke(date)
+
+        fillRange()
+    }
+
+    fun fillRange()
+    {
+        for (i in 0 until childCount)
+        {
+            (getChildAt(0) as CapView).isNeedCapDraw = false
+        }
+
+        if (selectedDayView != null && secondSelectedDayView != null)
+        {
+            val dateFrom = LightCalendarView.firstDate
+            val dateTo = LightCalendarView.secondDate
+
+            if (null != dateFrom && null != dateTo)
+            {
+                if (dateFrom.before(firstDate.time) || dateTo.before(firstDate.time))
+                {
+                    for (i in 0 until rowNum)
+                    {
+                        (getChildAt(0) as CapView).isNeedCapDraw = true
+                    }
+                }
+            }
+
+            for (i in 0 until childCount)
+            {
+                //TODO
+                //(getChildAt(0) as CapView).isNeedCapDraw = false
+            }
         }
     }
 
