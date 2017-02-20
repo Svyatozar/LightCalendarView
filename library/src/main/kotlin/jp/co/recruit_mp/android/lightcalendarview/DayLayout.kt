@@ -139,6 +139,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
     private fun setSelectedDay(view: DayView?) {
         //TODO
+        val dateFrom = LightCalendarView.firstDate
+        val dateTo = LightCalendarView.secondDate
 
         when (view)
         {
@@ -161,7 +163,10 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             }
 
             else -> {
-                if (selectedDayView != null) {
+                if (LightCalendarView.firstDate != null) {
+
+                }
+                else if (selectedDayView != null) {
 
                     secondSelectedDayView?.apply {
                         isSelected = false

@@ -89,9 +89,12 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
         addOnPageChangeListener(onPageChangeListener)
 
         currentItem = getPositionForDate(Date())
+        //offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
     }
 
     companion object {
+        var OFFSCREEN_PAGE_LIMIT = 1000
+
         var firstDate : Date? = null
         var secondDate : Date? = null
     }
@@ -284,5 +287,7 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
         override fun isViewFromObject(view: View?, obj: Any?): Boolean = view === obj
 
         override fun getCount(): Int = Math.max(0, monthTo.monthsAfter(settings, monthFrom).toInt() + 1)
+
+        //override fun getCount(): Int = Math.max(0, monthTo.monthsAfter(settings, monthFrom).toInt() + 1)
     }
 }

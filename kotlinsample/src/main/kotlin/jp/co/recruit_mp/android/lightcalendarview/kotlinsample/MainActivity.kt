@@ -23,8 +23,8 @@ class MainActivity : AppCompatActivity() {
         calendarView = findViewById(R.id.calendarView) as? LightCalendarView ?: throw IllegalStateException("calendarView not found")
 
         calendarView.apply {
-            monthFrom = Calendar.getInstance().apply { set(Calendar.MONTH, 0) }.time
-            monthTo = Calendar.getInstance().apply { set(Calendar.MONTH, 11) }.time
+            monthFrom = Calendar.getInstance().apply { set(Calendar.YEAR, 2014) }.time//Calendar.getInstance().apply { set(Calendar.MONTH, 0) }.time
+            monthTo = Calendar.getInstance().apply { set(Calendar.YEAR, 2018) }.time
             monthCurrent = Calendar.getInstance().time
 
             // set the calendar view callbacks
