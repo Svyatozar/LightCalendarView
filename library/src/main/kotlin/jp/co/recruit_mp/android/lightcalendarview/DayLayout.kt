@@ -152,7 +152,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             }
 
             secondSelectedDayView -> {
-                selectedDayView?.apply {
+                secondSelectedDayView?.apply {
                     isSelected = false
                     updateState()
                 }
@@ -162,6 +162,12 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
             else -> {
                 if (selectedDayView != null) {
+
+                    secondSelectedDayView?.apply {
+                        isSelected = false
+                        updateState()
+                    }
+
                     secondSelectedDayView = view?.apply {
                         isSelected = true
                         updateState()
@@ -205,26 +211,41 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
             if (null != dateFrom && null != dateTo)
             {
-                if (dateFrom.before(firstDate.time) || dateTo.before(firstDate.time))
-                {
-                    for (i in 0 until rowNum)
-                    {
-                        (getChildAt(0) as CapView).isNeedCapDraw = true
+                /**
+                 * Проходимся по датам и заглушкам в промежутке, учитывая отрезки, выходящие за пределы месяца
+                 */
+                val cal = firstDate.clone() as Calendar
+
+                for (i in 0 until rowNum) {
+                    var isDayViewExistInRow = true
+
+                    for (j in 0 until colNum) {
+                        if ((i != 0 && j == 0) && (getCapView(i,j) is EmptyView)) {
+                            isDayViewExistInRow = false
+                        }
+
+                        if (cal.time.between(dateFrom, dateTo)) {
+                            getCapView(i,j)?.isNeedCapDraw = true
+                        }
+                        else if ((cal[Calendar.MONTH] < thisMonth) || (cal[Calendar.YEAR] < thisYear)) {
+                            getCapView(i,j)?.isNeedCapDraw = true
+                        }
+                        else if (isDayViewExistInRow and ((cal[Calendar.MONTH] > thisMonth) || (cal[Calendar.YEAR] > thisYear))) {
+                            getCapView(i,j)?.isNeedCapDraw = true
+                        }
+
+                        cal.add(Calendar.DAY_OF_YEAR, 1)
                     }
                 }
             }
-
-            for (i in 0 until childCount)
-            {
-                //TODO
-                //(getChildAt(0) as CapView).isNeedCapDraw = false
-            }
         }
     }
-
     /**
      * 日付に対応する {@link DayView} を返す
      */
     fun getDayView(date: Date): DayView? = childList.getOrNull(date.daysAfter(firstDate.time).toInt()) as? DayView
-
+    fun getCapView(row: Int, col: Int): CapView? {
+        val position = row*rowNum + col
+        return childList.getOrNull(position) as? CapView
+    }
 }

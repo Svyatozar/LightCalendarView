@@ -45,9 +45,10 @@ class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : Cap
         get() = accents.fold(0, { w, a -> w + a.width + a.marginLeftRight * 2 })
 
     private var circlePaint: Paint = settings.dayView.defaultCirclePaint
-    private var squarePaint: Paint = Paint().apply {
+    private var blackPaint: Paint = Paint().apply {
         color = Color.BLACK
         style = Paint.Style.FILL
+        isAntiAlias = true
     }
 
     private var textPaint: Paint = settings.dayView.defaultTextPaint(weekDay)
@@ -199,7 +200,7 @@ class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : Cap
         circlePaint = if (DateUtils.isToday(date.time)) {
             settings.dayView.todayCirclePaint
         } else {
-            settings.dayView.defaultCirclePaint
+            blackPaint
         }
 
         when {
