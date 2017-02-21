@@ -34,19 +34,7 @@ internal fun Date.isSameDay(settings: CalendarSettings, date: Date): Boolean {
 internal fun Date.daysAfter(date: Date): Long = ((this.time - date.time) / TimeUnit.DAYS.toMillis(1))
 
 internal fun Date.between(dateFirst: Date, dateSecond: Date) : Boolean {
-    val min : Date
-    val max : Date
-
-    if (dateFirst.before(dateSecond)) {
-        min = dateFirst
-        max = dateSecond
-    }
-    else {
-        min = dateSecond
-        max = dateFirst
-    }
-
-    return compareTo(min) >= 0 && compareTo(max) <= 0
+    return compareTo(listOf(dateFirst, dateSecond).min()) > 0 && compareTo(listOf(dateFirst, dateSecond).max()) < 0
 }
 
 internal fun Date.month(): Int {

@@ -238,16 +238,6 @@ class DayView(context: Context, settings: CalendarSettings, cal: Calendar) : Cap
         super.onDraw(canvas)
 
         canvas?.let {
-            if (isNeedCapDraw) {
-                /**
-                 * Описываем высоту грани квадрата, которого можно вписать в окружность
-                 */
-                val resultHeight = it.height / settings.dayView.squareRootOf2
-                val margin = (it.height - resultHeight) / 2
-
-                it?.drawRect(0f, margin.toFloat(), it.height.toFloat(), (it.height.toFloat() - margin).toFloat(), capPaint)
-            }
-
             // 背景の描画
             if (drawCircle) {
                 it.drawCircle(centerX, centerY, currentRadius, circlePaint)

@@ -161,10 +161,6 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     }
 
     private fun setSelectedDay(view: DayView?) {
-        //TODO
-
-        // TODO view?.let { Bus.send(DateSelectedEvent(view.date)) }
-
         if (view == null) {
             fillRange()
             return
@@ -276,21 +272,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
                 selectedDayView = null
             }
-        } else {
-            dateFrom?.let {
-                if (it.month() == thisMonth) {
-                    selectedDayView = getDayView(it)
-                    selectedDayView?.apply {
-                        isSelected = true
-                        updateState()
-                    }
-                }
-            }
         }
 
-        /**
-         * Восстанавливаем метки, в случае если view был создан заново
-         */
         if (secondSelectedDayView != null) {
             if (secondSelectedDayView?.date != LightCalendarView.secondDate) {
                 secondSelectedDayView?.apply {
@@ -301,24 +284,13 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                 secondSelectedDayView = null
             }
         }
-        else {
-            dateTo?.let {
-                if (it.month() == thisMonth) {
-                    secondSelectedDayView = getDayView(it)
-                    secondSelectedDayView?.apply {
-                        isSelected = true
-                        updateState()
-                    }
-                }
-            }
-        }
 
         /**
          * Очищаем заполнение цветом
          */
         for (i in 0 until childCount)
         {
-            (getChildAt(0) as CapView).isNeedCapDraw = false
+            (getChildAt(i) as CapView).state = CapView.INVISIBLE
         }
 
         if (null != dateFrom && null != dateTo)
@@ -336,14 +308,56 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                         isDayViewExistInRow = false
                     }
 
-                    if (cal.time.between(dateFrom, dateTo)) {
-                        getCapView(i,j)?.isNeedCapDraw = true
-                    }
-                    else if ((cal[Calendar.MONTH] < thisMonth) || (cal[Calendar.YEAR] < thisYear)) {
-                        getCapView(i,j)?.isNeedCapDraw = true
-                    }
-                    else if (isDayViewExistInRow and ((cal[Calendar.MONTH] > thisMonth) || (cal[Calendar.YEAR] > thisYear))) {
-                        getCapView(i,j)?.isNeedCapDraw = true
+                    when (cal.time) {
+                        dateFrom -> {
+                            if (cal.time > dateTo) {
+                                getCapView(i,j)?.state = CapView.ROUND_RIGHT
+                            } else {
+                                getCapView(i,j)?.state = CapView.ROUND_LEFT
+                            }
+
+                            if (null == selectedDayView) {
+                                val markView = getCapView(i,j)
+
+                                if (markView is DayView) {
+                                    selectedDayView = markView.apply {
+                                        isSelected = true
+                                        updateState()
+                                    }
+                                }
+                            }
+                        }
+
+                        dateTo -> {
+                            if (cal.time > dateFrom) {
+                                getCapView(i,j)?.state = CapView.ROUND_RIGHT
+                            } else {
+                                getCapView(i,j)?.state = CapView.ROUND_LEFT
+                            }
+
+                            if (null == secondSelectedDayView) {
+                                val markView = getCapView(i,j)
+
+                                if (markView is DayView) {
+                                    secondSelectedDayView = markView.apply {
+                                        isSelected = true
+                                        updateState()
+                                    }
+                                }
+                            }
+                        }
+
+                        else -> {
+                            if (cal.time.between(dateFrom, dateTo)) {
+                                getCapView(i,j)?.state = CapView.VISIBLE
+                            }
+//                    else if ((cal[Calendar.MONTH] < thisMonth) || (cal[Calendar.YEAR] < thisYear)) {
+//                        getCapView(i,j)?.isNeedCapDraw = true
+//                    }
+//                    else if (isDayViewExistInRow and ((cal[Calendar.MONTH] > thisMonth) || (cal[Calendar.YEAR] > thisYear))) {
+//                        getCapView(i,j)?.isNeedCapDraw = true
+//                    }
+                        }
                     }
 
                     cal.add(Calendar.DAY_OF_YEAR, 1)
@@ -356,7 +370,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
      */
     fun getDayView(date: Date): DayView? = childList.getOrNull(date.daysAfter(firstDate.time).toInt()) as? DayView
     fun getCapView(row: Int, col: Int): CapView? {
-        val position = row*rowNum + col
+        val position = row*colNum + col
         return childList.getOrNull(position) as? CapView
     }
 
