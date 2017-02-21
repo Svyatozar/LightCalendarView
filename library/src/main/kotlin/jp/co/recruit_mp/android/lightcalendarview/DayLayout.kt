@@ -35,6 +35,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         val DEFAULT_DAYS_IN_WEEK = WeekDay.values().size
 
         var isTodayWasSetted = false
+        val FIRST_ROW = 0
+        val PENULT_ROW = DEFAULT_WEEKS - 2
+        val LAST_ROW = DEFAULT_WEEKS - 1
     }
 
     override val rowNum: Int
@@ -301,13 +304,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             val cal = firstDate.clone() as Calendar
 
             for (i in 0 until rowNum) {
-                var isDayViewExistInRow = true
-
                 for (j in 0 until colNum) {
-                    if ((i != 0 && j == 0) && (getCapView(i,j) is EmptyView)) {
-                        isDayViewExistInRow = false
-                    }
-
                     when (cal.time) {
                         dateFrom -> {
                             if (cal.time > dateTo) {
@@ -351,16 +348,51 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                             if (cal.time.between(dateFrom, dateTo)) {
                                 getCapView(i,j)?.state = CapView.VISIBLE
                             }
-//                    else if ((cal[Calendar.MONTH] < thisMonth) || (cal[Calendar.YEAR] < thisYear)) {
-//                        getCapView(i,j)?.isNeedCapDraw = true
-//                    }
-//                    else if (isDayViewExistInRow and ((cal[Calendar.MONTH] > thisMonth) || (cal[Calendar.YEAR] > thisYear))) {
-//                        getCapView(i,j)?.isNeedCapDraw = true
-//                    }
                         }
                     }
 
                     cal.add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }
+
+            /**
+             * Заполняем заглушки в первом ряду, если вторая точка установлена в предыдущем месяце
+             */
+
+            val prevMonth = thisMonth - 1
+            if ((dateFrom.month() == prevMonth) || (dateTo.month() == prevMonth)) {
+                (0 until colNum).forEach {
+                    val capView: CapView? = getCapView(FIRST_ROW, it)
+                    if (capView is DayView) {
+                        if ((capView.date == dateFrom) || (capView.date == dateTo)) {
+                            return@forEach
+                        }
+
+                        capView?.state = CapView.VISIBLE
+                    } else {
+                        capView?.state = CapView.VISIBLE
+                    }
+                }
+            }
+
+            val nextMonth = thisMonth + 1
+            var isNeedColorize = false
+            if ((dateFrom.month() == nextMonth) || (dateTo.month() == nextMonth)) {
+                (0 until colNum).forEach {
+                    val capView: CapView? = getCapView(PENULT_ROW, it)
+                    if (capView is DayView) {
+                        if ((capView.date == dateFrom) || (capView.date == dateTo)) {
+                            isNeedColorize = true
+                        } else if (isNeedColorize) {
+                            capView?.state = CapView.VISIBLE
+                        }
+                    }
+                }
+
+                if (!isDayViewExistInRow(LAST_ROW)) {
+                    (0 until colNum).forEach {
+                        getCapView(LAST_ROW, it)?.state = CapView.INVISIBLE
+                    }
                 }
             }
         }
@@ -372,6 +404,10 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     fun getCapView(row: Int, col: Int): CapView? {
         val position = row*colNum + col
         return childList.getOrNull(position) as? CapView
+    }
+
+    fun isDayViewExistInRow(rowNum: Int) : Boolean {
+        return (0 until colNum).any { getCapView(it,rowNum) is DayView }
     }
 
     class DateSelectedEvent(date: Date)
