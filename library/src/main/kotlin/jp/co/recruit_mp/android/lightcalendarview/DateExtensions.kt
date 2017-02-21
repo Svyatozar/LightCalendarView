@@ -33,8 +33,7 @@ internal fun Date.isSameDay(settings: CalendarSettings, date: Date): Boolean {
 /** 自身が date の何日後かを返す */
 internal fun Date.daysAfter(date: Date): Long = ((this.time - date.time) / TimeUnit.DAYS.toMillis(1))
 
-internal fun Date.between(dateFirst: Date, dateSecond: Date) : Boolean
-{
+internal fun Date.between(dateFirst: Date, dateSecond: Date) : Boolean {
     val min : Date
     val max : Date
 
@@ -48,6 +47,20 @@ internal fun Date.between(dateFirst: Date, dateSecond: Date) : Boolean
     }
 
     return compareTo(min) >= 0 && compareTo(max) <= 0
+}
+
+internal fun Date.month(): Int {
+    val thisCal = Calendar.getInstance()
+    thisCal.time = this
+
+    return thisCal[Calendar.MONTH]
+}
+
+internal fun Date.year(): Int {
+    val thisCal = Calendar.getInstance()
+    thisCal.time = this
+
+    return thisCal[Calendar.YEAR]
 }
 
 /** 自身が date の何ヶ月後かを返す */

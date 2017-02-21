@@ -18,6 +18,9 @@ package jp.co.recruit_mp.android.lightcalendarview
 
 import android.content.Context
 import android.support.v4.view.ViewCompat
+import android.widget.Toast
+import com.eightbitlab.rxbus.Bus
+import com.eightbitlab.rxbus.registerInBus
 import jp.co.recruit_mp.android.lightcalendarview.views.CapView
 import java.util.*
 
@@ -30,6 +33,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     companion object {
         val DEFAULT_WEEKS = 6
         val DEFAULT_DAYS_IN_WEEK = WeekDay.values().size
+
+        var isTodayWasSetted = false
     }
 
     override val rowNum: Int
@@ -69,11 +74,19 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
         settings.addObserver(observer)
+        //subscribe to events
+        Bus.observe<DateSelectedEvent>()
+                .subscribe { fillRange() }
+                .registerInBus(this)
     }
 
     override fun onDetachedFromWindow() {
         settings.deleteObserver(observer)
+        //unsubscribe from events
+        Bus.unregister(this)
+
         super.onDetachedFromWindow()
     }
 
@@ -134,13 +147,55 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
      * @param date 選択する日
      */
     fun setSelectedDay(date: Date) {
-        setSelectedDay(getDayView(date))
+        var dayView = getDayView(date)
+
+        if ((null != dayView) and (!isTodayWasSetted))
+        {
+            isTodayWasSetted = true
+        }
+        else {
+            dayView = null
+        }
+
+        setSelectedDay(dayView)
     }
 
     private fun setSelectedDay(view: DayView?) {
         //TODO
+
+        // TODO view?.let { Bus.send(DateSelectedEvent(view.date)) }
+
+        if (view == null) {
+            fillRange()
+            return
+        }
+
+        /**
+         * Рассматриваем случай, если первая дата уже выбрана, и она не в этом месяце
+         */
         val dateFrom = LightCalendarView.firstDate
-        val dateTo = LightCalendarView.secondDate
+
+        dateFrom?.let {
+            if ((dateFrom.month() != thisMonth) || (dateFrom.year() != thisYear)) {
+                secondSelectedDayView?.apply {
+                    isSelected = false
+                    updateState()
+                }
+
+                secondSelectedDayView = view?.apply {
+                    isSelected = true
+                    updateState()
+                }
+
+                view?.let {
+                    LightCalendarView.secondDate = view.date
+                    onDateRangeSelected?.invoke(dateFrom, view.date)
+                    Bus.send(DateSelectedEvent(view.date))
+                }
+
+                return
+            }
+        }
 
         when (view)
         {
@@ -151,6 +206,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                 }
 
                 selectedDayView = null
+                LightCalendarView.firstDate = null
             }
 
             secondSelectedDayView -> {
@@ -160,14 +216,11 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                 }
 
                 secondSelectedDayView = null
+                LightCalendarView.secondDate = null
             }
 
             else -> {
-                if (LightCalendarView.firstDate != null) {
-
-                }
-                else if (selectedDayView != null) {
-
+                if (selectedDayView != null) {
                     secondSelectedDayView?.apply {
                         isSelected = false
                         updateState()
@@ -193,54 +246,107 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                     selectedDayView = view?.apply {
                         isSelected = true
                         updateState()
-                        onDateSelected?.invoke(date)
+                    }
+
+                    LightCalendarView.firstDate = view?.date
+                    view?.let { onDateSelected?.invoke(it.date) }
+                }
+            }
+        }
+
+        view?.let {
+            Bus.send(DateSelectedEvent(view.date))
+        }
+    }
+
+    fun fillRange()
+    {
+        val dateFrom = LightCalendarView.firstDate
+        val dateTo = LightCalendarView.secondDate
+
+        /**
+         * Снимаем метки, если начало или окончание промежутка в другом месяце
+         */
+        if (selectedDayView != null) {
+            if (selectedDayView?.date != LightCalendarView.firstDate) {
+                selectedDayView?.apply {
+                    isSelected = false
+                    updateState()
+                }
+
+                selectedDayView = null
+            }
+        } else {
+            dateFrom?.let {
+                if (it.month() == thisMonth) {
+                    selectedDayView = getDayView(it)
+                    selectedDayView?.apply {
+                        isSelected = true
+                        updateState()
                     }
                 }
             }
         }
 
-        fillRange()
-    }
+        /**
+         * Восстанавливаем метки, в случае если view был создан заново
+         */
+        if (secondSelectedDayView != null) {
+            if (secondSelectedDayView?.date != LightCalendarView.secondDate) {
+                secondSelectedDayView?.apply {
+                    isSelected = false
+                    updateState()
+                }
 
-    fun fillRange()
-    {
+                secondSelectedDayView = null
+            }
+        }
+        else {
+            dateTo?.let {
+                if (it.month() == thisMonth) {
+                    secondSelectedDayView = getDayView(it)
+                    secondSelectedDayView?.apply {
+                        isSelected = true
+                        updateState()
+                    }
+                }
+            }
+        }
+
+        /**
+         * Очищаем заполнение цветом
+         */
         for (i in 0 until childCount)
         {
             (getChildAt(0) as CapView).isNeedCapDraw = false
         }
 
-        if (selectedDayView != null && secondSelectedDayView != null)
+        if (null != dateFrom && null != dateTo)
         {
-            val dateFrom = LightCalendarView.firstDate
-            val dateTo = LightCalendarView.secondDate
+            /**
+             * Проходимся по датам и заглушкам в промежутке, учитывая отрезки, выходящие за пределы месяца
+             */
+            val cal = firstDate.clone() as Calendar
 
-            if (null != dateFrom && null != dateTo)
-            {
-                /**
-                 * Проходимся по датам и заглушкам в промежутке, учитывая отрезки, выходящие за пределы месяца
-                 */
-                val cal = firstDate.clone() as Calendar
+            for (i in 0 until rowNum) {
+                var isDayViewExistInRow = true
 
-                for (i in 0 until rowNum) {
-                    var isDayViewExistInRow = true
-
-                    for (j in 0 until colNum) {
-                        if ((i != 0 && j == 0) && (getCapView(i,j) is EmptyView)) {
-                            isDayViewExistInRow = false
-                        }
-
-                        if (cal.time.between(dateFrom, dateTo)) {
-                            getCapView(i,j)?.isNeedCapDraw = true
-                        }
-                        else if ((cal[Calendar.MONTH] < thisMonth) || (cal[Calendar.YEAR] < thisYear)) {
-                            getCapView(i,j)?.isNeedCapDraw = true
-                        }
-                        else if (isDayViewExistInRow and ((cal[Calendar.MONTH] > thisMonth) || (cal[Calendar.YEAR] > thisYear))) {
-                            getCapView(i,j)?.isNeedCapDraw = true
-                        }
-
-                        cal.add(Calendar.DAY_OF_YEAR, 1)
+                for (j in 0 until colNum) {
+                    if ((i != 0 && j == 0) && (getCapView(i,j) is EmptyView)) {
+                        isDayViewExistInRow = false
                     }
+
+                    if (cal.time.between(dateFrom, dateTo)) {
+                        getCapView(i,j)?.isNeedCapDraw = true
+                    }
+                    else if ((cal[Calendar.MONTH] < thisMonth) || (cal[Calendar.YEAR] < thisYear)) {
+                        getCapView(i,j)?.isNeedCapDraw = true
+                    }
+                    else if (isDayViewExistInRow and ((cal[Calendar.MONTH] > thisMonth) || (cal[Calendar.YEAR] > thisYear))) {
+                        getCapView(i,j)?.isNeedCapDraw = true
+                    }
+
+                    cal.add(Calendar.DAY_OF_YEAR, 1)
                 }
             }
         }
@@ -253,4 +359,6 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         val position = row*rowNum + col
         return childList.getOrNull(position) as? CapView
     }
+
+    class DateSelectedEvent(date: Date)
 }
