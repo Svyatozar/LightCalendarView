@@ -4,6 +4,8 @@
         <attr name="lcv_weekDayTextSize" format="dimension" />
         <attr name="lcv_dayTextSize" format="dimension" />
         <attr name="lcv_textColor" format="reference|color" />
+        <attr name="lcv_selectedTextColor" format="reference|color" />
+        <attr name="lcv_weekTextColor" format="reference|color" />
         <attr name="lcv_selectionColor" format="reference|color" />
         <attr name="lcv_accentColor" format="reference|color" />
         <attr name="lcv_firstDayOfWeek" format="integer" />

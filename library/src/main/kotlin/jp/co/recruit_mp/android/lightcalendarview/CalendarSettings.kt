@@ -55,6 +55,12 @@ class CalendarSettings(private val context: Context) : ObservableSettings() {
                 defaultTextPaints.values.forEach { it.color = value }
             }
 
+        var selectedTextColor: Int = context.getStyledColor(android.R.attr.textColorPrimary, context.getColorCompat(R.color.light_calendar_view__week_day_weekday_text_color))
+            set(value) {
+                field = value
+                defaultTextPaints.values.forEach { it.color = value }
+            }
+
         var textSize: Float = context.getStyledDimension(android.R.attr.textSize, context.getDimension(R.dimen.light_calendar_view__week_day_text_size))
             set(value) {
                 field = value
@@ -89,6 +95,10 @@ class CalendarSettings(private val context: Context) : ObservableSettings() {
 
         internal fun setTextColorStateList(colorStateList: ColorStateList) {
             textColor = colorStateList.getColorForState(State.DEFAULT.value, textColor)
+        }
+
+        internal fun setSelectedTextColor(colorStateList: ColorStateList) {
+            selectedTextColor = colorStateList.getColorForState(State.DEFAULT.value, textColor)
         }
 
         internal fun setTextFilterColor(weekDay: WeekDay, color: Int?) {
@@ -186,7 +196,6 @@ class CalendarSettings(private val context: Context) : ObservableSettings() {
         private fun initializeSelectedTextPaint() = baseTextPaint.copy().typeface(Typeface.DEFAULT_BOLD).color(context.getStyledColor(android.R.attr.textColorPrimaryInverse, context.getColorCompat(R.color.light_calendar_view__day_selected_text_color)))
         private fun initializedSelectedTodayTextPaint() = baseTextPaint.copy().typeface(Typeface.DEFAULT_BOLD).color(context.getStyledColor(android.R.attr.textColorPrimaryInverse, context.getColorCompat(R.color.light_calendar_view__day_selected_today_text_color)))
         // ---------------------------------------------------------------------------------------------------------
-
         // ------------ Accent -------------------------------------------------------------------------------------
         internal var defaultAccentPaint: Paint = initializedDefaultAccentPaint()
         internal var todayAccentPaint: Paint = initializedTodayAccentPaint()

@@ -78,6 +78,8 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
                 R.styleable.LightCalendarView_lcv_weekDayTextSize -> setWeekDayRawTextSize(a.getDimension(attr, 0f))
                 R.styleable.LightCalendarView_lcv_dayTextSize -> setDayRawTextSize(a.getDimension(attr, 0f))
                 R.styleable.LightCalendarView_lcv_textColor -> setTextColor(a.getColorStateList(attr))
+                R.styleable.LightCalendarView_lcv_selectedTextColor -> setSelectionTextColor(a.getColorStateList(attr))
+                R.styleable.LightCalendarView_lcv_weekTextColor -> setWeekTextColor(a.getColorStateList(attr))
                 R.styleable.LightCalendarView_lcv_selectionColor -> setSelectionColor(a.getColorStateList(attr))
                 R.styleable.LightCalendarView_lcv_accentColor -> setAccentColor(a.getColorStateList(attr))
                 R.styleable.LightCalendarView_lcv_firstDayOfWeek -> setFirstDayOfWeek(a.getInt(attr, 0))
@@ -179,11 +181,20 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
      * 文字色を設定する
      */
     fun setTextColor(colorStateList: ColorStateList) {
+        settings.dayView.apply {
+            setTextColorStateList(colorStateList)
+        }.notifySettingsChanged()
+    }
+
+    fun setWeekTextColor(colorStateList: ColorStateList) {
         settings.weekDayView.apply {
             setTextColorStateList(colorStateList)
         }.notifySettingsChanged()
+    }
+
+    fun setSelectionTextColor(colorStateList: ColorStateList) {
         settings.dayView.apply {
-            setTextColorStateList(colorStateList)
+            setSelectionTextColor(colorStateList)
         }.notifySettingsChanged()
     }
 
