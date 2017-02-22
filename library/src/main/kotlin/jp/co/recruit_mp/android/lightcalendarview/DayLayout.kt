@@ -374,7 +374,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                             FIRST_ROW -> {
                                 if ((dateFrom.month() < thisMonth) || (dateTo.month() < thisMonth) || (dateFrom.year() < thisYear) || (dateTo.year() < thisYear)) {
                                     if (((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) and (cal.time.month() < thisMonth)) {
-                                        it?.state = CapView.VISIBLE
+                                        if (month.between(dateFrom, dateTo)) {
+                                            it?.state = CapView.VISIBLE
+                                        }
                                     } else {
                                         it?.state = CapView.INVISIBLE
                                     }
@@ -386,7 +388,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                                     if (isDaysExistInPenultRow) {
                                         if (cal.time.month() > thisMonth) {
                                             if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
-                                                it?.state = CapView.VISIBLE
+                                                if (month.between(dateFrom, dateTo)) {
+                                                    it?.state = CapView.VISIBLE
+                                                }
                                             } else {
                                                 it?.state = CapView.INVISIBLE
                                             }
@@ -402,7 +406,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                                     if (isDaysExistInLastRow) {
                                         if (cal.time.month() > thisMonth) {
                                             if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
-                                                it?.state = CapView.VISIBLE
+                                                if (month.between(dateFrom, dateTo)) {
+                                                    it?.state = CapView.VISIBLE
+                                                }
                                             } else {
                                                 it?.state = CapView.INVISIBLE
                                             }
@@ -416,6 +422,21 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                     }
 
                     cal.add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }
+
+            /**
+             * Рассматриваем случай, если месяц оказался посередине между двумя датами - закрашиваем все, если это так
+             */
+            cal = firstDate.clone() as Calendar
+
+            if ((dateFrom.month() != thisMonth) && (dateTo.month() != thisMonth)) {
+                if (month.between(dateFrom, dateTo)) {
+                    for (i in 0 until rowNum) {
+                        (0 until colNum)
+                                .map { getCapView(i, it) }
+                                .forEach {if (isDayViewExistInRow(i)) { it?.state = CapView.VISIBLE } }
+                    }
                 }
             }
         }
