@@ -46,6 +46,6 @@ enum class WeekDay {
         }
     }
 
-    fun getShortLabel(context: Context): String = context.getStringArray(R.array.week_days_short)[ordinal]
+    fun getShortLabel(context: Context): String = context.getStringArray(R.array.week_days_short)[ordinal].substring(0 until 1)
     fun getLabel(context: Context): String = context.getStringArray(R.array.week_days_full)[ordinal]
 }

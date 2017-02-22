@@ -259,6 +259,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         }
     }
 
+    /**
+     * I'm not touching that one with a twenty-foot pole
+     */
     fun fillRange()
     {
         val dateFrom = LightCalendarView.firstDate
