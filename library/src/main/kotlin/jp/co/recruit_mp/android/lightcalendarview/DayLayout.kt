@@ -18,6 +18,7 @@ package jp.co.recruit_mp.android.lightcalendarview
 
 import android.content.Context
 import android.support.v4.view.ViewCompat
+import android.view.View
 import android.widget.Toast
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
@@ -301,7 +302,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             /**
              * Проходимся по датам и заглушкам в промежутке, учитывая отрезки, выходящие за пределы месяца
              */
-            val cal = firstDate.clone() as Calendar
+            var cal = firstDate.clone() as Calendar
 
             for (i in 0 until rowNum) {
                 for (j in 0 until colNum) {
@@ -345,8 +346,10 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                         }
 
                         else -> {
+                            val capView = getCapView(i,j)
+
                             if (cal.time.between(dateFrom, dateTo)) {
-                                getCapView(i,j)?.state = CapView.VISIBLE
+                                capView?.state = CapView.VISIBLE
                             }
                         }
                     }
@@ -356,43 +359,63 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             }
 
             /**
-             * Заполняем заглушки в первом ряду, если вторая точка установлена в предыдущем месяце
+             * Заполняем пустые места, или наоборот очищаем, в зависимости от того, находится ли дата за
+             * пределами данного месяца
              */
+            cal = firstDate.clone() as Calendar
+            val isDaysExistInPenultRow = isDayViewExistInRow(PENULT_ROW)
+            val isDaysExistInLastRow = isDayViewExistInRow(LAST_ROW)
+            for (i in 0 until rowNum) {
+                (0 until colNum)
+                .map { getCapView(i, it) }
+                .forEach {
+                    if (it !is DayView) {
+                        when (i) {
+                            FIRST_ROW -> {
+                                if ((dateFrom.month() < thisMonth) || (dateTo.month() < thisMonth) || (dateFrom.year() < thisYear) || (dateTo.year() < thisYear)) {
+                                    if (((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) and (cal.time.month() < thisMonth)) {
+                                        it?.state = CapView.VISIBLE
+                                    } else {
+                                        it?.state = CapView.INVISIBLE
+                                    }
+                                }
+                            }
 
-            val prevMonth = thisMonth - 1
-            if ((dateFrom.month() == prevMonth) || (dateTo.month() == prevMonth)) {
-                (0 until colNum).forEach {
-                    val capView: CapView? = getCapView(FIRST_ROW, it)
-                    if (capView is DayView) {
-                        if ((capView.date == dateFrom) || (capView.date == dateTo)) {
-                            return@forEach
+                            PENULT_ROW -> {
+                                if ((dateFrom.month() > thisMonth) || (dateTo.month() > thisMonth) || (dateFrom.year() > thisYear) || (dateTo.year() > thisYear)) {
+                                    if (isDaysExistInPenultRow) {
+                                        if (cal.time.month() > thisMonth) {
+                                            if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
+                                                it?.state = CapView.VISIBLE
+                                            } else {
+                                                it?.state = CapView.INVISIBLE
+                                            }
+                                        }
+                                    } else {
+                                        it?.state = CapView.INVISIBLE
+                                    }
+                                }
+                            }
+
+                            LAST_ROW -> {
+                                if ((dateFrom.month() > thisMonth) || (dateTo.month() > thisMonth) || (dateFrom.year() > thisYear) || (dateTo.year() > thisYear)) {
+                                    if (isDaysExistInLastRow) {
+                                        if (cal.time.month() > thisMonth) {
+                                            if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
+                                                it?.state = CapView.VISIBLE
+                                            } else {
+                                                it?.state = CapView.INVISIBLE
+                                            }
+                                        }
+                                    } else {
+                                        it?.state = CapView.INVISIBLE
+                                    }
+                                }
+                            }
                         }
-
-                        capView?.state = CapView.VISIBLE
-                    } else {
-                        capView?.state = CapView.VISIBLE
                     }
-                }
-            }
 
-            val nextMonth = thisMonth + 1
-            var isNeedColorize = false
-            if ((dateFrom.month() == nextMonth) || (dateTo.month() == nextMonth)) {
-                (0 until colNum).forEach {
-                    val capView: CapView? = getCapView(PENULT_ROW, it)
-                    if (capView is DayView) {
-                        if ((capView.date == dateFrom) || (capView.date == dateTo)) {
-                            isNeedColorize = true
-                        } else if (isNeedColorize) {
-                            capView?.state = CapView.VISIBLE
-                        }
-                    }
-                }
-
-                if (!isDayViewExistInRow(LAST_ROW)) {
-                    (0 until colNum).forEach {
-                        getCapView(LAST_ROW, it)?.state = CapView.INVISIBLE
-                    }
+                    cal.add(Calendar.DAY_OF_YEAR, 1)
                 }
             }
         }
@@ -406,8 +429,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         return childList.getOrNull(position) as? CapView
     }
 
-    fun isDayViewExistInRow(rowNum: Int) : Boolean {
-        return (0 until colNum).any { getCapView(it,rowNum) is DayView }
+    fun isDayViewExistInRow(row: Int) : Boolean {
+        return (0 until colNum).any { getCapView(row, it) is DayView }
     }
 
     class DateSelectedEvent(date: Date)
