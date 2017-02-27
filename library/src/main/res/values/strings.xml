@@ -1,5 +1,7 @@
 <resources>
     <string name="month_view_tag_name" translatable="false">lightcalendarview:monthview:%1$d</string>
+    <string name="undo">ОТМЕНА</string>
+    <string name="ok">OK</string>
 
     <string-array name="week_days_short">
         <item>Sun</item>

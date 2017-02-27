@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             onDateSelected = { date -> Log.i("MainActivity", "onDateSelected: date = $date") }
 
             val dateRangeCalendarDialog = DateRangeCalendarDialog()
-            //dateRangeCalendarDialog.show(supportFragmentManager, "")
+            dateRangeCalendarDialog.show(supportFragmentManager, "")
         }
 
 

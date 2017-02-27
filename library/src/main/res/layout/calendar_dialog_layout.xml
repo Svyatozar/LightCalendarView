@@ -66,13 +66,38 @@
 
             <TextView
                 android:id="@+id/dateRangeTextView"
-                android:layout_margin="14dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="16dp"
                 android:fontFamily="sans-serif-medium"
                 tools:text="01.07.2017 — 13.01.2017"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="@color/colorDefaultBlack"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@android:id/button2"
+                    android:text="@string/undo"
+                    android:textColor="#66717E"
+                    style="?attr/buttonBarNegativeButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@android:id/button1"
+                    android:text="@string/ok"
+                    android:textColor="#66717E"
+                    android:layout_marginRight="16dp"
+                    style="?attr/buttonBarPositiveButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
