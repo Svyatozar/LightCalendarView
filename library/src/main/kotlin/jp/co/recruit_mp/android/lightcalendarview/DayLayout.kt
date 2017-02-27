@@ -377,7 +377,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                             FIRST_ROW -> {
                                 if ((dateFrom.month() < thisMonth) || (dateTo.month() < thisMonth) || (dateFrom.year() < thisYear) || (dateTo.year() < thisYear)) {
                                     if (((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) and (cal.time.month() < thisMonth)) {
-                                        if (month.between(dateFrom, dateTo)) {
+                                        if (isDateInRange()) {
                                             it?.state = CapView.VISIBLE
                                         }
                                     } else {
@@ -391,7 +391,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                                     if (isDaysExistInPenultRow) {
                                         if (cal.time.month() > thisMonth) {
                                             if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
-                                                if (month.between(dateFrom, dateTo)) {
+                                                if (isDateInRange()) {
                                                     it?.state = CapView.VISIBLE
                                                 }
                                             } else {
@@ -409,7 +409,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                                     if (isDaysExistInLastRow) {
                                         if (cal.time.month() > thisMonth) {
                                             if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
-                                                if (month.between(dateFrom, dateTo)) {
+                                                if (isDateInRange()) {
                                                     it?.state = CapView.VISIBLE
                                                 }
                                             } else {
@@ -444,6 +444,23 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             }
         }
     }
+
+    fun isDateInRange() : Boolean {
+        val dateFrom = LightCalendarView.firstDate
+        val dateTo = LightCalendarView.secondDate
+
+        if (null != dateFrom) {
+            if (null != dateTo) {
+                val minYear = listOf(dateFrom.year(), dateTo.year()).min() ?: Int.MAX_VALUE
+                val maxYear = listOf(dateFrom.year(), dateTo.year()).max() ?: Int.MIN_VALUE
+
+                return (minYear <= thisYear) and (maxYear >= thisYear)
+            }
+        }
+
+        return false
+    }
+
     /**
      * 日付に対応する {@link DayView} を返す
      */

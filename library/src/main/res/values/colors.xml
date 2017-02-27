@@ -19,4 +19,5 @@
     <color name="light_calendar_view__day_selected_today_dot_color">#885733</color>
 
     <color name="colorDefaultBackground">#F3F5F7</color>
+    <color name="colorDefaultBlack">#272E38</color>
 </resources>

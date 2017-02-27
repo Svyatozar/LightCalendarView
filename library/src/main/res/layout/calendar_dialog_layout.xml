@@ -1,7 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
-</LinearLayout>
+    <ScrollView
+        android:layout_width="328dp"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="328dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp">
+
+                <ImageView
+                    android:clickable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:id="@+id/arrowNextImageView"
+                    android:layout_width="46.6dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:scaleType="center"
+                    android:src="@drawable/arrow_next"/>
+
+                <TextView
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:id="@+id/dateHeaderTextView"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="Январь, 2107"
+                    android:text="Январь, 2107"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorDefaultBlack"/>
+
+                <ImageView
+                    android:clickable="true"
+                    android:id="@+id/arrowPrevImageView"
+                    android:background="?attr/selectableItemBackground"
+                    android:layout_width="46.6dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:src="@drawable/arrow_prew"/>
+            </FrameLayout>
+
+            <jp.co.recruit_mp.android.lightcalendarview.LightCalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-16dp"
+                app:lcv_weekDayTextSize="12sp"
+                app:lcv_dayTextSize="12sp"
+                app:lcv_textColor="@color/calendar_day_text"
+                app:lcv_selectionColor="@color/calendar_selection"
+                app:lcv_accentColor="@color/calendar_accent"
+                app:lcv_firstDayOfWeek="@integer/lcv_monday"/>
+
+            <TextView
+                android:id="@+id/dateRangeTextView"
+                android:layout_margin="14dp"
+                android:fontFamily="sans-serif-medium"
+                tools:text="01.07.2017 — 13.01.2017"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/colorDefaultBlack"/>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

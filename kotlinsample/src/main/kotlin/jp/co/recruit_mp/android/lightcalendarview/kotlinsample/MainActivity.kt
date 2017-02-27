@@ -7,6 +7,7 @@ import android.util.Log
 import jp.co.recruit_mp.android.lightcalendarview.LightCalendarView
 import jp.co.recruit_mp.android.lightcalendarview.accent.Accent
 import jp.co.recruit_mp.android.lightcalendarview.accent.DotAccent
+import jp.co.recruit_mp.android.lightcalendarview.dialogs.DateRangeCalendarDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,6 +64,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             onDateSelected = { date -> Log.i("MainActivity", "onDateSelected: date = $date") }
+
+            val dateRangeCalendarDialog = DateRangeCalendarDialog()
+            //dateRangeCalendarDialog.show(supportFragmentManager, "")
         }
 
 
