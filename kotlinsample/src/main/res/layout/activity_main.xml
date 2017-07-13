@@ -15,23 +15,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <jp.co.recruit_mp.android.lightcalendarview.LightCalendarView
-                android:id="@+id/calendarView"
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:lcv_weekDayTextSize="12sp"
-                app:lcv_dayTextSize="12sp"
-                app:lcv_textColor="@color/calendar_day_text"
-                app:lcv_selectionColor="@color/calendar_selection"
-                app:lcv_accentColor="@color/calendar_accent"
-                app:lcv_firstDayOfWeek="@integer/lcv_monday"/>
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <jp.co.recruit_mp.android.lightcalendarview.LightCalendarView
+                    android:id="@+id/calendarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:lcv_weekDayTextSize="12sp"
+                    app:lcv_dayTextSize="12sp"
+                    app:lcv_textColor="@color/calendar_day_text"
+                    app:lcv_selectionColor="@color/calendar_selection"
+                    app:lcv_accentColor="@color/calendar_accent"
+                    app:lcv_firstDayOfWeek="@integer/lcv_monday"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </FrameLayout>
+
     </ScrollView>
 
 </RelativeLayout>

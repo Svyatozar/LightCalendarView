@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content">
 
                 <Button
-                    android:id="@android:id/button2"
+                    android:id="@+id/buttonCancel"
                     android:text="@string/undo"
                     android:textColor="#66717E"
                     style="?attr/buttonBarNegativeButtonStyle"
@@ -90,7 +90,7 @@
                     android:layout_height="wrap_content" />
 
                 <Button
-                    android:id="@android:id/button1"
+                    android:id="@+id/buttonOk"
                     android:text="@string/ok"
                     android:textColor="#66717E"
                     android:layout_marginRight="16dp"

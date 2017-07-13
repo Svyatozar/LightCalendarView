@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var calendarView: LightCalendarView
 
     private val formatter = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+    val dateRangeCalendarDialog = DateRangeCalendarDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,11 +65,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             onDateSelected = { date -> Log.i("MainActivity", "onDateSelected: date = $date") }
-
-            val dateRangeCalendarDialog = DateRangeCalendarDialog()
-            dateRangeCalendarDialog.show(supportFragmentManager, "")
         }
 
+        findViewById(R.id.button)?.setOnClickListener {
+            dateRangeCalendarDialog.show(supportFragmentManager, "")
+        }
 
         // change the actionbar title
         supportActionBar?.title = formatter.format(calendarView.monthCurrent)

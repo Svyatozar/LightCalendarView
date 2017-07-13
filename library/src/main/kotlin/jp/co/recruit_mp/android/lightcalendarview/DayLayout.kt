@@ -18,8 +18,6 @@ package jp.co.recruit_mp.android.lightcalendarview
 
 import android.content.Context
 import android.support.v4.view.ViewCompat
-import android.view.View
-import android.widget.Toast
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import jp.co.recruit_mp.android.lightcalendarview.views.CapView
@@ -50,7 +48,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     internal var secondSelectedDayView: DayView? = null
 
     internal var onDateSelected: ((date: Date) -> Unit)? = null
-    internal var onDateRangeSelected: ((firstDate: Date, secondDate: Date) -> Unit)? = null
+    internal var onDateRangeSelected: ((firstDate: Date?, secondDate: Date?) -> Unit)? = null
 
     private var firstDate: Calendar = CalendarKt.getInstance(settings)
     private var dayOfWeekOffset: Int = -1
@@ -69,7 +67,7 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         updateLayout()
 
         // 今日を選択
-        setSelectedDay(Date())
+        //setSelectedDay(Date())
     }
 
     private val observer = Observer { observable, any ->
@@ -84,6 +82,24 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         Bus.observe<DateSelectedEvent>()
                 .subscribe { fillRange() }
                 .registerInBus(this)
+
+        if (null != LightCalendarView.firstDate) {
+            val date = Calendar.getInstance()
+            date.time = LightCalendarView.firstDate
+
+            if (thisMonth == date.get(Calendar.MONTH)) {
+                setSelectedDay(LightCalendarView.firstDate!!)
+            }
+        }
+
+        if (null != LightCalendarView.secondDate) {
+            val date = Calendar.getInstance()
+            date.time = LightCalendarView.secondDate
+
+            if (thisMonth == date.get(Calendar.MONTH)) {
+                setSelectedDay(LightCalendarView.secondDate!!)
+            }
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -152,14 +168,14 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
      */
     fun setSelectedDay(date: Date) {
         var dayView = getDayView(date)
-
-        if ((null != dayView) and (!isTodayWasSetted))
-        {
-            isTodayWasSetted = true
-        }
-        else {
-            dayView = null
-        }
+//
+//        if ((null != dayView) and (!isTodayWasSetted))
+//        {
+//            isTodayWasSetted = true
+//        }
+//        else {
+//            dayView = null
+//        }
 
         setSelectedDay(dayView)
     }
@@ -207,6 +223,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
                 selectedDayView = null
                 LightCalendarView.firstDate = null
+
+                onDateRangeSelected?.invoke(LightCalendarView.firstDate, LightCalendarView.secondDate)
             }
 
             secondSelectedDayView -> {
@@ -217,6 +235,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
 
                 secondSelectedDayView = null
                 LightCalendarView.secondDate = null
+
+                onDateRangeSelected?.invoke(LightCalendarView.firstDate, LightCalendarView.secondDate)
             }
 
             else -> {
@@ -464,7 +484,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     /**
      * 日付に対応する {@link DayView} を返す
      */
-    fun getDayView(date: Date): DayView? = childList.getOrNull(date.daysAfter(firstDate.time).toInt()) as? DayView
+    fun getDayView(date: Date): DayView? = childList.find {
+        date.isSameDay(settings, (it as? DayView)?.date ?: Date())
+    } as? DayView
     fun getCapView(row: Int, col: Int): CapView? {
         val position = row*colNum + col
         return childList.getOrNull(position) as? CapView

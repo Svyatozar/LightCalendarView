@@ -38,7 +38,7 @@ class LightCalendarView(context: Context, attrs: AttributeSet? = null, defStyleA
     private var selectedPage: Int = 0
     var onMonthSelected: ((date: Date, view: MonthView) -> Unit)? = null
     var onDateSelected: ((date: Date) -> Unit)? = null
-    var onDateRangeSelected: ((firstDate: Date, secondDate: Date) -> Unit)? = null
+    var onDateRangeSelected: ((firstDate: Date?, secondDate: Date?) -> Unit)? = null
 
     private val onPageChangeListener: OnPageChangeListener = object : SimpleOnPageChangeListener() {
         override fun onPageSelected(position: Int) {
