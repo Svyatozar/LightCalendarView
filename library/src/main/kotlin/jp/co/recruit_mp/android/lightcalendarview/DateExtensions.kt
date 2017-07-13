@@ -24,9 +24,19 @@ import java.util.concurrent.TimeUnit
  */
 
 /** 日付が一致するかどうかを返す */
-internal fun Date.isSameDay(settings: CalendarSettings, date: Date): Boolean {
-    val thisCal = CalendarKt.getInstance(settings).apply { time = this@isSameDay }
-    val thatCal = CalendarKt.getInstance(settings).apply { time = date }
+internal fun Date.isSameDay(settings: CalendarSettings, date: Date?): Boolean {
+    if (date != null) {
+        val thisCal = CalendarKt.getInstance(settings).apply { time = this@isSameDay }
+        val thatCal = CalendarKt.getInstance(settings).apply { time = date }
+        return (thisCal[Calendar.YEAR] == thatCal[Calendar.YEAR] && thisCal[Calendar.DAY_OF_YEAR] == thatCal[Calendar.DAY_OF_YEAR])
+    } else {
+        return false
+    }
+}
+
+internal fun Date.isSameDay(date: Date): Boolean {
+    val thisCal = Calendar.getInstance().apply { time = this.time }
+    val thatCal = Calendar.getInstance().apply { time = date }
     return (thisCal[Calendar.YEAR] == thatCal[Calendar.YEAR] && thisCal[Calendar.DAY_OF_YEAR] == thatCal[Calendar.DAY_OF_YEAR])
 }
 

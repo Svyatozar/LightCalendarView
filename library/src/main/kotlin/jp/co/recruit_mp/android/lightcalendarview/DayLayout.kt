@@ -18,6 +18,7 @@ package jp.co.recruit_mp.android.lightcalendarview
 
 import android.content.Context
 import android.support.v4.view.ViewCompat
+import android.text.format.DateUtils
 import com.eightbitlab.rxbus.Bus
 import com.eightbitlab.rxbus.registerInBus
 import jp.co.recruit_mp.android.lightcalendarview.views.CapView
@@ -484,9 +485,12 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     /**
      * 日付に対応する {@link DayView} を返す
      */
-    fun getDayView(date: Date): DayView? = childList.find {
-        date.isSameDay(settings, (it as? DayView)?.date ?: Date())
-    } as? DayView
+    fun getDayView(date: Date): DayView? {
+        return childList.find {
+            date.isSameDay(settings, (it as? DayView)?.date)
+        } as? DayView
+    }
+
     fun getCapView(row: Int, col: Int): CapView? {
         val position = row*colNum + col
         return childList.getOrNull(position) as? CapView
