@@ -84,6 +84,8 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                 .subscribe { fillRange() }
                 .registerInBus(this)
 
+        fillBetweenRange()
+
         if (null != LightCalendarView.firstDate) {
             val date = Calendar.getInstance()
             date.time = LightCalendarView.firstDate
@@ -452,8 +454,18 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             /**
              * Рассматриваем случай, если месяц оказался посередине между двумя датами - закрашиваем все, если это так
              */
-            cal = firstDate.clone() as Calendar
+            fillBetweenRange()
+        }
+    }
 
+    fun fillBetweenRange() {
+        /**
+         * Рассматриваем случай, если месяц оказался посередине между двумя датами - закрашиваем все, если это так
+         */
+        val dateFrom = LightCalendarView.firstDate
+        val dateTo = LightCalendarView.secondDate
+
+        if (null != dateFrom && null != dateTo) {
             if ((dateFrom.month() != thisMonth) && (dateTo.month() != thisMonth)) {
                 if (month.between(dateFrom, dateTo)) {
                     for (i in 0 until rowNum) {
