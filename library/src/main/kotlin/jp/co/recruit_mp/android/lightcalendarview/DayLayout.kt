@@ -282,11 +282,25 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
         }
     }
 
+    fun sendDateRangeIfNeeded() {
+        var date1 = selectedDayView?.date
+        var date2 = secondSelectedDayView?.date
+
+        if (date1 != null && date2 != null) {
+            val firstDate = if (date1.time < date2.time) date1 else date2
+            val secondDate = if (date1.time > date2.time) date1 else date2
+
+            onDateRangeSelected?.invoke(firstDate, secondDate)
+        }
+    }
+
     /**
      * I'm not touching that one with a twenty-foot pole
      */
     fun fillRange()
     {
+        sendDateRangeIfNeeded()
+
         val dateFrom = LightCalendarView.firstDate
         val dateTo = LightCalendarView.secondDate
 
@@ -393,27 +407,13 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
             val isDaysExistInLastRow = isDayViewExistInRow(LAST_ROW)
             for (i in 0 until rowNum) {
                 (0 until colNum)
-                .map { getCapView(i, it) }
-                .forEach {
-                    if (it !is DayView) {
-                        when (i) {
-                            FIRST_ROW -> {
-                                if ((dateFrom.month() < thisMonth) || (dateTo.month() < thisMonth) || (dateFrom.year() < thisYear) || (dateTo.year() < thisYear)) {
-                                    if (((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) and (cal.time.month() < thisMonth)) {
-                                        if (isDateInRange()) {
-                                            it?.state = CapView.VISIBLE
-                                        }
-                                    } else {
-                                        it?.state = CapView.INVISIBLE
-                                    }
-                                }
-                            }
-
-                            PENULT_ROW -> {
-                                if ((dateFrom.month() > thisMonth) || (dateTo.month() > thisMonth) || (dateFrom.year() > thisYear) || (dateTo.year() > thisYear)) {
-                                    if (isDaysExistInPenultRow) {
-                                        if (cal.time.month() > thisMonth) {
-                                            if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
+                        .map { getCapView(i, it) }
+                        .forEach {
+                            if (it !is DayView) {
+                                when (i) {
+                                    FIRST_ROW -> {
+                                        if ((dateFrom.month() < thisMonth) || (dateTo.month() < thisMonth) || (dateFrom.year() < thisYear) || (dateTo.year() < thisYear)) {
+                                            if (((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) and (cal.time.month() < thisMonth)) {
                                                 if (isDateInRange()) {
                                                     it?.state = CapView.VISIBLE
                                                 }
@@ -421,34 +421,48 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                                                 it?.state = CapView.INVISIBLE
                                             }
                                         }
-                                    } else {
-                                        it?.state = CapView.INVISIBLE
                                     }
-                                }
-                            }
 
-                            LAST_ROW -> {
-                                if ((dateFrom.month() > thisMonth) || (dateTo.month() > thisMonth) || (dateFrom.year() > thisYear) || (dateTo.year() > thisYear)) {
-                                    if (isDaysExistInLastRow) {
-                                        if (cal.time.month() > thisMonth) {
-                                            if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
-                                                if (isDateInRange()) {
-                                                    it?.state = CapView.VISIBLE
+                                    PENULT_ROW -> {
+                                        if ((dateFrom.month() > thisMonth) || (dateTo.month() > thisMonth) || (dateFrom.year() > thisYear) || (dateTo.year() > thisYear)) {
+                                            if (isDaysExistInPenultRow) {
+                                                if (cal.time.month() > thisMonth) {
+                                                    if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
+                                                        if (isDateInRange()) {
+                                                            it?.state = CapView.VISIBLE
+                                                        }
+                                                    } else {
+                                                        it?.state = CapView.INVISIBLE
+                                                    }
                                                 }
                                             } else {
                                                 it?.state = CapView.INVISIBLE
                                             }
                                         }
-                                    } else {
-                                        it?.state = CapView.INVISIBLE
+                                    }
+
+                                    LAST_ROW -> {
+                                        if ((dateFrom.month() > thisMonth) || (dateTo.month() > thisMonth) || (dateFrom.year() > thisYear) || (dateTo.year() > thisYear)) {
+                                            if (isDaysExistInLastRow) {
+                                                if (cal.time.month() > thisMonth) {
+                                                    if ((dateFrom.month() == thisMonth) || (dateTo.month() == thisMonth)) {
+                                                        if (isDateInRange()) {
+                                                            it?.state = CapView.VISIBLE
+                                                        }
+                                                    } else {
+                                                        it?.state = CapView.INVISIBLE
+                                                    }
+                                                }
+                                            } else {
+                                                it?.state = CapView.INVISIBLE
+                                            }
+                                        }
                                     }
                                 }
                             }
+
+                            cal.add(Calendar.DAY_OF_YEAR, 1)
                         }
-                    }
-
-                    cal.add(Calendar.DAY_OF_YEAR, 1)
-                }
             }
 
             /**
