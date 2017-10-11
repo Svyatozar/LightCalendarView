@@ -184,9 +184,22 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
     }
 
     private fun setSelectedDay(view: DayView?) {
+        var isSingleDate = false
+
         if (view == null) {
             fillRange()
             return
+        } else {
+            if (!view.isSelected) {
+                onDateRangeSelected?.invoke(view.date, null)
+            } else {
+                val checkedDayView = childList.find { it != view && (it as? DayView)?.isSelected ?: false }
+                (checkedDayView as? DayView)?.date?.let {
+                    isSingleDate = true
+                    LightCalendarView.firstDate = it
+                    onDateRangeSelected?.invoke(it, null)
+                }
+            }
         }
 
         /**
@@ -227,7 +240,9 @@ class DayLayout(context: Context, settings: CalendarSettings, var month: Date) :
                 selectedDayView = null
                 LightCalendarView.firstDate = null
 
-                onDateRangeSelected?.invoke(LightCalendarView.firstDate, LightCalendarView.secondDate)
+                if (!isSingleDate) {
+                    onDateRangeSelected?.invoke(LightCalendarView.firstDate, LightCalendarView.secondDate)
+                }
             }
 
             secondSelectedDayView -> {

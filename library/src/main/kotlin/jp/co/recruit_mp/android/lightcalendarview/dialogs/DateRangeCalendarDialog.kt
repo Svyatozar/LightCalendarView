@@ -30,6 +30,7 @@ class DateRangeCalendarDialog : DialogFragment() {
     var date2: Date? = null
 
     internal var callback: ((firstDate: Date, secondDate: Date) -> Unit)? = null
+    internal var singleCallback: ((firstDate: Date) -> Unit)? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.calendar_dialog_layout, null)
@@ -68,6 +69,9 @@ class DateRangeCalendarDialog : DialogFragment() {
 
                 if (firstDate != null && secondDate != null) {
                     dateRangeTextView.text = rangeFormatter.format(firstDate) + " — " + rangeFormatter.format(secondDate)
+                } else if (firstDate != null ){
+                    dateRangeTextView.text = rangeFormatter.format(firstDate)
+                    singleCallback?.invoke(firstDate)
                 } else {
                     dateRangeTextView.text = ""
                 }
@@ -88,6 +92,11 @@ class DateRangeCalendarDialog : DialogFragment() {
 
     fun setCallback(callback: ((firstDate: Date, secondDate: Date) -> Unit)?): DateRangeCalendarDialog {
         this.callback = callback
+        return this
+    }
+
+    fun setSingleCallback(callback: ((secondDate: Date) -> Unit)?): DateRangeCalendarDialog {
+        this.singleCallback = callback
         return this
     }
 
